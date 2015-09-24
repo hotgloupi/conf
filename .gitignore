@@ -1,6 +1,8 @@
 *
 !.vim
 !.vimrc
+!.nvim
+!.nvimrc
 !.zshrc
 !.oh-my-zsh
 !.tmux.conf
