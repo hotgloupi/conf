@@ -1,0 +1,8 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_1='/home/hotgloupi/8cube-infra/buildbot/master/root/templates'
+let g:netrw_dirhist_2='/home/hotgloupi/sandbox/docker-bot/src'
+let g:netrw_dirhist_3='/home/hotgloupi/sandbox/docker-bot/src/dockerbot'
+let g:netrw_dirhist_4='/home/hotgloupi/sandbox/docker-bot/src/dockerbot/command'
+let g:netrw_dirhist_5='/home/hotgloupi/8cube-infra'
+let g:netrw_dirhist_6='/home/hotgloupi/8cube-infra/buildbot'

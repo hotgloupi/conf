@@ -1,0 +1,22 @@
+[core]
+    excludesfile = ~/.gitignore
+[user]
+    name = Raphaël Londeix
+    email = raphael.londeix@celoxica.com
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+[alias]
+    ci = commit
+    co = checkout
+    st = status
+    br = branch
+    ls = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[branch]
+    autosetuprebase = always
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
+[push]
+    default = matching
