@@ -20,12 +20,12 @@ bindkey "^[[1;5D" backward-word
 bindkey '^W' vi-backward-kill-word
 
 # FreeBSD + xterm
-if [ -n `echo $TERM | grep rxvt` ]
-then
-  bindkey "\e[3~" delete-char
-  bindkey "\e[7~" beginning-of-line
-  bindkey "\e[8~" end-of-line
-fi
+#if [ -n `echo $TERM | grep rxvt` ]
+#then
+#  bindkey "\e[3~" delete-char
+#  bindkey "\e[7~" beginning-of-line
+#  bindkey "\e[8~" end-of-line
+#fi
 
 function zle-line-init () { echoti smkx }
 function zle-line-finish () { echoti rmkx }
@@ -169,3 +169,5 @@ bindkey "\e[B" history-search-forward-end     # cursor down
 
 PERL_MB_OPT="--install_base \"/home/raph/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=/home/raph/perl5"; export PERL_MM_OPT;
+[[ $TMUX = ""  ]] && export TERM="xterm-256color" || export TERM="screen-256color"
+
