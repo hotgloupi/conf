@@ -1,0 +1,84 @@
+#!/bin/sh
+set -e
+set -u
+#set -x
+BOX_REBUILD=${BOX_REBUILD:-0}
+[ -z "$(docker images -q box)" -o  "${BOX_REBUILD}" = 1 ] && (
+	docker build --rm -t box - << EOF
+FROM 32bit/debian:jessie
+RUN apt-get update --fix-missing
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+		   python-dev \
+		   python-pip \
+		   git \
+		   zip \
+		   libboost1.55-all-dev \
+		   cmake \
+		   subversion \
+		   curl \
+		   mercurial \
+		   zsh \
+		   vim
+
+RUN cd /tmp && \
+	svn co http://llvm.org/svn/llvm-project/llvm/trunk llvm && \
+	cd llvm/tools && \
+	svn co http://llvm.org/svn/llvm-project/cfe/trunk clang && \
+	cd .. && \
+	mkdir build && \
+	cd build && \
+	../configure \
+		--prefix=/usr/local \
+		--enable-optimized \
+		--enable-targets=host \
+	&& make -j4 \
+	&& make install \
+	&& cd /tmp \
+	&& rm -rf llvm
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y pkg-config
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y autotools-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libtool
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libtool-bin
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y automake
+
+RUN cd /tmp \
+	&& git clone https://github.com/neovim/neovim neovim \
+	&& cd neovim \
+	&& make install \
+		CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=/usr/local" \
+		CMAKE_BUILD_TYPE=Release \
+	&& cd .. && rm -rf neovim
+
+RUN pip install neovim
+
+RUN groupadd -r ${USER} -g $(id -g) && useradd -r -g ${USER} -u $(id -u) ${USER}
+RUN mkdir -p ${HOME}
+RUN chown ${USER}:${USER} -R ${HOME}
+
+USER ${USER}
+WORKDIR ${HOME}
+
+RUN git clone https://github.com/hotgloupi/conf.git . \
+	&& git submodule update --init --recursive
+
+RUN nvim --cmd 'let g:loaded_youcompleteme = 1' -c 'BundleInstall' -c 'qa'
+RUN ./.vim/bundle/YouCompleteMe/install.py --system-libclang --clang-completer
+
+CMD ${SHELL}
+
+EOF
+)
+
+if [ $# != 1 ]; then
+	echo "Usage: $0 DIR"
+	exit 1
+fi
+
+function abspath()
+{
+	python -c 'import os,sys; print(os.path.abspath(sys.argv[1]))' $1
+}
+
+DIR=$(abspath "$1")
+docker run -w $DIR -h "$(hostname -s)-box" --rm -v $DIR:$DIR -ti box

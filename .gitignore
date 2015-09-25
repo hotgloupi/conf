@@ -8,3 +8,6 @@
 !.tmux.conf
 !.gitconfig
 !.gitignore
+!local
+!local/bin
+!local/bin/box
