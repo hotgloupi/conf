@@ -188,8 +188,8 @@ let g:jedi#popup_on_dot = 0
 " - clang-format =============================================================
 
 " -- Map clang format
-autocmd FileType c,cpp,objc map <C-K> :pyf /usr/share/vim/addons/syntax/clang-format-3.5.py<CR>
-autocmd FileType c,cpp,objc imap <C-K> <c-o>:pyf /usr/share/vim/addons/syntax/clang-format-3.5.py<CR>
+autocmd FileType c,cpp,objc map <C-K> :pyf $HOME/local/bin/clang-format.py<CR>
+autocmd FileType c,cpp,objc imap <C-K> <c-o>:pyf $HOME/local/bin/clang-format.py<CR>
 
 "#############################################################################
 " - Generic options ==========================================================

@@ -9,3 +9,7 @@
 !.gitconfig
 !.gitignore
 !.gitignore_global
+!local
+!local/bin
+!local/bin/box
+!local/bin/clang-format.py
