@@ -231,8 +231,8 @@ set showmatch
 set formatoptions=croql
 set tabpagemax=200
 
-" -- Do not replace TAB with spaces
-set noexpandtab
+" -- Do replace TAB with spaces
+set expandtab
 
 " -- Size of tabs and indentation are the same
 set softtabstop=4
