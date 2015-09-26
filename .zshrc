@@ -57,6 +57,9 @@ normal="%{${fg_no_bold[white]}%}"
 #PROMPT="${green}%n${normal}@${green}%m${red}:${blue}%~${normal}$ "
 #RPROMPT="${red}~${normal}"
 export PROMPT='$lightgray%n$gray@$blue%m:$normal%~ %(?,$green,$red%?)➤ %{$reset_color%}'
+if [ -n "${BOX}" ]; then
+	export PROMPT="${red}BOX${normal} $PROMPT"
+fi
 
 function mkcd()
 {
