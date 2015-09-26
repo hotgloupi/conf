@@ -65,8 +65,29 @@ RUN git clone https://github.com/hotgloupi/conf.git . \
 RUN nvim --cmd 'let g:loaded_youcompleteme = 1' -c 'BundleInstall' -c 'qa'
 RUN ./.vim/bundle/YouCompleteMe/install.py --system-libclang --clang-completer
 
-CMD ${SHELL}
+USER root
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gdb
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tmux
 
+RUN chsh -s ${SHELL} ${USER}
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
+RUN echo "${USER}:${USER}" | chpasswd && adduser ${USER} sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales-all
+ENV LANG ${LANG}
+ENV LANGUAGE ${LANGUAGE}
+ENV LC_ALL ${LC_ALL}
+RUN locale-gen ${LC_ALL}
+RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+
+ENV BOX 1
+
+USER ${USER}
+CMD ${SHELL}
 EOF
 )
 
@@ -81,4 +102,10 @@ function abspath()
 }
 
 DIR=$(abspath "$1")
-docker run -w $DIR -h "$(hostname -s)-box" --rm -v $DIR:$DIR -ti box
+docker run \
+	-w $DIR \
+	-h "[$(hostname -s)]" \
+	--rm \
+	-v ${HOME}/.ssh:${HOME}.ssh \
+	-v $DIR:$DIR \
+	-ti box
