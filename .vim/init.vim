@@ -1,1 +1,1 @@
-/home/hotgloupi/.vimrc
+../.vimrc
