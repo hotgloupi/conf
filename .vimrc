@@ -30,6 +30,8 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'wting/rust.vim'
 Bundle 'junegunn/seoul256.vim'
 Plugin 'bling/vim-airline'
+Bundle 'junegunn/vim-easy-align'
+Plugin 'octol/vim-cpp-enhanced-highlight'
 
 filetype plugin indent on
 syntax on
@@ -80,7 +82,7 @@ let g:ycm_global_ycm_extra_conf = $HOME
 let g:ycm_autoclose_preview_window_after_completion = 1
 
 " -- ...
-let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_autoclose_preview_window_after_insertion = 0
 
 
 "#############################################################################
@@ -156,6 +158,12 @@ function! g:vimprj#dHooks['OnAfterSourcingVimprj']['main_options'](dParams)
 
 	endif
 endfunction
+
+"#############################################################################
+" - easy-align bundle ========================================================
+
+nmap ga <Plug>(EasyAlign)
+xmap ga <Plug>(EasyAlign)
 
 "#############################################################################
 " - Leader mapping ===========================================================
@@ -377,12 +385,13 @@ endif
 "colorscheme ir_black
 if has("gvim")
 	set background=dark
-	"colorscheme darkbone
+	colorscheme darkbone
 	"colorscheme solarized
-	colorscheme seoul256
+    "colorscheme seoul256
 else
 	"	colorscheme gardener
-	colorscheme seoul256
+	"colorscheme seoul256
+	colorscheme darkbone
 endif
 
 " -- Darken whitespaces chars
