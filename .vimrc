@@ -1,48 +1,42 @@
-set nocompatible               " be iMproved
-filetype off                   " required!
-if has('neovim')
-	let s:python_host_init = 'python -c "import neovim; neovim.start_host()"'
-	let &initpython = s:python_host_init
-endif
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+call plug#begin('~/.vim/plugged')
 
-" let Vundle manage Vundle
-" required!
-Bundle 'gmarik/vundle'
+Plug 'tpope/vim-sensible'
+Plug 'flazz/vim-colorschemes'
+Plug 'vim-scripts/indentpython.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-fugitive'
+Plug 'bling/vim-airline'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+Plug 'junegunn/fzf.vim'
+Plug 'vim-scripts/Cpp11-Syntax-Support'
 
-Bundle 'jiangmiao/auto-pairs'
-Bundle 'flazz/vim-colorschemes'
-Bundle 'vim-scripts/Cpp11-Syntax-Support'
-Bundle 'vim-scripts/DfrankUtil'
-Bundle 'vim-scripts/FuzzyFinder'
-Bundle 'vim-scripts/indentpython.vim'
-Bundle 'vim-scripts/L9'
-Bundle 'vim-scripts/IndentTab'
-Bundle 'vim-scripts/vimprj'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
-Bundle 'scrooloose/nerdtree'
-Bundle 'tpope/vim-fugitive'
-Bundle 'Valloric/YouCompleteMe'
-Bundle 'scrooloose/syntastic'
-Bundle 'davidhalter/jedi-vim'
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'wting/rust.vim'
-Bundle 'junegunn/seoul256.vim'
-Plugin 'bling/vim-airline'
-Bundle 'junegunn/vim-easy-align'
-Plugin 'octol/vim-cpp-enhanced-highlight'
+"Plug 'jiangmiao/auto-pairs'
+"Plug 'vim-scripts/DfrankUtil'
+"Plug 'vim-scripts/FuzzyFinder'
+"Plug 'vim-scripts/L9'
+"Plug 'vim-scripts/IndentTab'
+"Plug 'scrooloose/syntastic'
+"Plug 'davidhalter/jedi-vim'
+"Plug 'altercation/vim-colors-solarized'
+"Plug 'junegunn/seoul256.vim'
+"Plug 'junegunn/vim-easy-align'
+"Plug 'octol/vim-cpp-enhanced-highlight'
+
+call plug#end()
 
 filetype plugin indent on
 syntax on
 
 if has("gui_macvim")
-	set macmeta
+    set macmeta
 endif
 
 set hidden
-let g:racer_cmd = "/home/raph/sandbox/racer/bin/racer"
-let $RUST_SRC_PATH="/home/raph/sandbox/rust/src"
 
 "#############################################################################
 " - AutoPairs bundle =========================================================
@@ -73,17 +67,58 @@ let g:syntastic_warning_symbol='⚠'
 " - YouCompleteMe bundle =====================================================
 
 " -- Do not ask to load extra conf files.
-let g:ycm_confirm_extra_conf = 0
+"let g:ycm_confirm_extra_conf = 0
+"
+"" -- Use home directory default directory
+""let g:ycm_global_ycm_extra_conf = $HOME
+"
+"" -- ...
+"let g:ycm_autoclose_preview_window_after_completion = 1
+"
+"" -- ...
+"let g:ycm_autoclose_preview_window_after_insertion = 0
 
-" -- Use home directory default directory
-let g:ycm_global_ycm_extra_conf = $HOME
+"#############################################################################
+" - vim-lsp ==================================================================
 
-" -- ...
-let g:ycm_autoclose_preview_window_after_completion = 1
+imap <c-space> <Plug>(asyncomplete_force_refresh)
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr> pumvisible() ? "\<C-y>\<cr>" : "\<cr>"
+autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
-" -- ...
-let g:ycm_autoclose_preview_window_after_insertion = 0
+"let g:lsp_log_verbose = 1
+"let g:lsp_log_file = expand('/tmp/vim-lsp.log')
+"let g:asyncomplete_log_file = expand('/tmp/asyncomplete.log')
 
+" for asyncomplete.vim log
+let g:lsp_async_completion = 1
+
+if executable($NVIM_PYLS_BINARY)
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyls',
+        \ 'cmd': {server_info->[$NVIM_PYLS_BINARY]},
+        \ 'whitelist': ['python'],
+        \ })
+endif
+
+if executable($NVIM_CQUERY_BINARY)
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'cquery',
+      \ 'cmd': {server_info->[$NVIM_CQUERY_BINARY, '--language-server', '--log-file', '/tmp/cquery.log']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      \ 'initialization_options': { 'cacheDirectory': '/spare/local/rlondeix/cquery-cache' },
+      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
+      \ })
+endif
+
+"if executable($NVIM_CLANGD_BINARY)
+"    au User lsp_setup call lsp#register_server({
+"        \ 'name': 'clangd',
+"        \ 'cmd': {server_info->[$NVIM_CLANGD_BINARY]},
+"        \ 'whitelist': ['cpp', 'c'],
+"        \ })
+"endif
 
 "#############################################################################
 " - jedi bundle ==============================================================
@@ -91,31 +126,19 @@ let g:ycm_autoclose_preview_window_after_insertion = 0
 " Don't insert first autocomplete result
 let g:jedi#popup_select_first = 0
 let g:jedi#popup_on_dot = 0
+let g:jedi#force_py_version = 'auto'
 
 "#############################################################################
-" - FuzzyFinder bundle =======================================================
+" - FZF bundle ===============================================================
 
-" -- Enable all modes
-let g:fuf_modesDisable = []
-
-" -- Exclude patterns
-if has("python")
-	python << EOF
-patterns = [
-    '.*~$',
-    '.*\.(o|png|PNG|JPG|class|CLASS|jpg|exe|bak|sw[po])$',
-    '_build',
-    'deps',
-    'build',
-    'dependencies'
-]
-import vim
-vim.command("let g:fuf_coveragefile_exclude = '%s'" % '|'.join(patterns))
-EOF
-let g:fuf_file_exclude = '\v' . g:fuf_coveragefile_exclude
-endif
-
-
+let g:fzf_command_prefix = 'Fzf'
+let g:fzf_layout = { 'up': '~20%' }
+"let g:fzf_layout = { 'window': 'enew' }
+"let g:fzf_layout = { 'window': '-tabnew' }
+"let g:fzf_layout = { 'window': '10split enew' }
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
 "#############################################################################
 " - NerdTree bundle ==========================================================
@@ -125,39 +148,6 @@ map <F3> <ESC>:NERDTreeToggle<CR>
 
 " -- Ignore file patterns
 let NERDTreeIgnore=['\.swp$', '\~$', '\.o$', '\.pyc$']
-
-"#############################################################################
-" - Vimprj bundle ============================================================
-
-call vimprj#init()
-
-" -- Do not change working directory
-let g:vimprj_changeCurDirIfVimprjFound = 0
-
-" -- Set vim file type
-au BufNewFile,BufRead *.vimprj set ft=vim
-
-" -- Called BEFORE sourcing .vimprj and when not sourcing
-function! g:vimprj#dHooks['SetDefaultOptions']['main_options'](dParams)
-	let g:vimprj_dir = substitute(a:dParams['sVimprjDirName'], '[/\\]\.vimprj$', '', '')
-
-	if &ft == 'c' || &ft == 'cpp'
-		":YcmCompleter ClearCompilationFlagCache
-"		let g:clang_user_options = ''
-"		if &ft == 'cpp'
-"			let g:clang_user_options = '-std=c++11 -stdlib=libc++ -I' . $HOME . '/local/lib/clang/3.4/include/'
-"		endif
-"		let g:single_compile_options = '-O3 ' . g:clang_user_options
-	endif
-endfunction
-
-" -- Called AFTER sourcing .vimprj and when not sourcing
-function! g:vimprj#dHooks['OnAfterSourcingVimprj']['main_options'](dParams)
-	unlet g:vimprj_dir
-	if &ft == 'c' || &ft == 'cpp'
-
-	endif
-endfunction
 
 "#############################################################################
 " - easy-align bundle ========================================================
@@ -174,30 +164,26 @@ let g:mapleader = "."
 
 " -- Fast saving with <leader>w
 nmap <leader>w :w!<cr>
-nnoremap <leader>d :YcmCompleter GoTo<CR>
+nnoremap <leader>d :LspDefinition<CR>
+nnoremap <leader>r :LspReferences<CR>
 
 " -- Search mappings:
 " --- Clear search highlight with <leader>/
 nmap <leader>/ :nohlsearch<cr>
 " --- Fuzzy mode with <leader>/f
-nmap <leader>/f :FufCoverageFile<cr>
+nmap <leader>/f :FzfFiles<cr>
 " --- Recent mode <leader>/r
-nmap <leader>/r :FufMruFile<cr>
+nmap <leader>/r :FzfHistory<cr>
 
 nmap <leader>n :cnext<CR>
 nmap <leader>p :cprevious<CR>
 
 "#############################################################################
-" - Jedi =====================================================================
-
-let g:jedi#popup_on_dot = 0
-
-"#############################################################################
 " - clang-format =============================================================
 
 " -- Map clang format
-autocmd FileType c,cpp,objc map <C-K> :pyf $HOME/local/bin/clang-format.py<CR>
-autocmd FileType c,cpp,objc imap <C-K> <c-o>:pyf $HOME/local/bin/clang-format.py<CR>
+autocmd FileType c,cpp,objc map <C-K> :pyf $NVIM_CLANG_FORMAT_SCRIPT_PATH<CR>
+autocmd FileType c,cpp,objc imap <C-K> <c-o>:pyf $NVIM_CLANG_FORMAT_SCRIPT_PATH<CR>
 
 "#############################################################################
 " - Generic options ==========================================================
@@ -262,13 +248,13 @@ set ruler
 
 " -- Remove all sound or visual error bell
 if has("gui_macvim")
-	" XXX on MacVim activating visual bell disables sound bell.-- ..
-	set visualbell
+    " XXX on MacVim activating visual bell disables sound bell.-- ..
+    set visualbell
 else
-	set noerrorbells
-	set novisualbell
-	set t_vb=
-	set tm=500
+    set noerrorbells
+    set novisualbell
+    set t_vb=
+    set tm=500
 endif
 
 " At least 3 lines of context.
@@ -360,38 +346,41 @@ if has("gui")
     " Make shift-insert work like in Xterm
     map! <S-Insert> <MiddleMouse>
     "map! <S-Insert> <MiddleMouse>
-	if has("win32")
-		set guifont=Lucida_Console:h10:cANSI
-	elseif has("gui_macvim")
-		set guifont=Monaco:h14
-		"set noantialias
-		" Start Full Screen
-		set fuoptions=maxvert,maxhorz
-		au GUIEnter * set fullscreen
-	else
-		"set guifont=Ubuntu\ Mono\ 12
-		"set guifont=Monaco\ 10
-		set guifont=Mono
-	endif
-	set t_Co=256
-	set guitablabel=%M\ %t
+    if has("win32")
+        set guifont=Lucida_Console:h10:cANSI
+    elseif has("gui_macvim")
+        set guifont=Monaco:h14
+        "set noantialias
+        " Start Full Screen
+        set fuoptions=maxvert,maxhorz
+        au GUIEnter * set fullscreen
+    else
+        "set guifont=Ubuntu\ Mono\ 12
+        "set guifont=Monaco\ 10
+        set guifont=Mono
+    endif
+    set t_Co=256
+    set guitablabel=%M\ %t
 else
-	set t_Co=256
+    set t_Co=256
 endif
+
+" Only redraw at the end of the macro
+set lazyredraw
 
 " -- Color scheme
 "colorscheme trivial256
 "colorscheme charged-256
 "colorscheme ir_black
 if has("gvim")
-	set background=dark
-	colorscheme darkbone
-	"colorscheme solarized
+    set background=dark
+    colorscheme darkbone
+    "colorscheme solarized
     "colorscheme seoul256
 else
-	"	colorscheme gardener
-	"colorscheme seoul256
-	colorscheme darkbone
+    "	colorscheme gardener
+    "colorscheme seoul256
+    colorscheme Monokai
 endif
 
 " -- Darken whitespaces chars
@@ -404,7 +393,7 @@ match RedundantSpaces /\(\s\+$\| \+\ze\t\|\t\zs \+\)\(\%#\)\@!/
 
 " -- Status line
 "set statusline=%1*%F%m%r%h%w\ [%{&ff}][%Y]\ %=\ (%04l,\ %02v)\ [%p%%]\ %<
-set statusline=%1*%F%m%r%h%w\ [%{&ff}][%Y]\ %{fugitive#statusline()}\ %=\ (%04l,\ %02v)\ [%p%%]\ %<
+"set statusline=%1*%F%m%r%h%w\ [%{&ff}][%Y]\ %{fugitive#statusline()}\ %=\ (%04l,\ %02v)\ [%p%%]\ %<
 set laststatus=2
 
 hi clear User1
@@ -423,8 +412,8 @@ hi StatusLineNC cterm=reverse,underline gui=reverse,underline
 
 " -- Highlight current line
 set cursorline
-highlight clear CursorLine
-hi CursorLine cterm=bold term=bold gui=bold
+"highlight clear CursorLine
+"hi CursorLine cterm=bold term=bold gui=bold
 
 " -- Tabs colors
 hi clear TabLine TabLineSel TabLineFill
@@ -450,7 +439,7 @@ inoremap {}     {}
 cmap !!w w !sudo tee % >/dev/null
 
 if has("win32")
-	source c:\Program\ Files\ (x86)\Vim\_vimrc
+    source c:\Program\ Files\ (x86)\Vim\_vimrc
 endif
 
 set clipboard+=unnamedplus
@@ -466,5 +455,9 @@ au BufNewFile,BufRead *
 \ endif                                                                                             |
 
 if has("nvim")
-	tnoremap <Esc> <C-\><C-n>
+    tnoremap <Esc> <C-\><C-n>
 endif
+
+set termguicolors
+"set guicursor=
+
